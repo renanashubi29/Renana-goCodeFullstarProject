@@ -12,9 +12,9 @@ export const SingleProductPage=()=>{
     const {productId}=useParams();
 const {products}=useContext(ShopContext);
 const product = products?.find(
-  p => p.id === Number(productId)
+  p => p._id=== productId
 );
-console.log("product",product);
+console.log("product",productId);
 
 const fieldValueArr = product ? Object.entries(product) : [];
 console.log(fieldValueArr);
@@ -27,24 +27,6 @@ const handleNavHome=()=>{
 
    navigate(`/`);
   }
-/* return(
-<>
-<Link to="/">HomePage</Link>
-{
-    fieldValueArr.map((item)=>
-    {
-        if(typeof(item[1])==='object')
-            return(<></>)
-        return (<div>
-            <p>{item[0]}{":  "}{item[1]}</p>
-        </div>)
-    }
-
-    )
-}
-
-</> 
-); */
 
 
 return (

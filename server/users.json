@@ -1,0 +1,62 @@
+[
+  {
+    "firstName": "Dana",
+    "lastName": "Cohen",
+    "userName": "danac",
+    "userId": "U2001",
+    "email": "dana.cohen@example.com",
+    "password": "123456",
+    "role": "admin",
+    "status": "active"
+  },
+  {
+    "firstName": "Noam",
+    "lastName": "Levi",
+    "userName": "noaml",
+    "userId": "U2002",
+    "email": "noam.levi@example.com",
+    "password": "123456",
+    "role": "user",
+    "status": "active"
+  },
+  {
+    "firstName": "Yael",
+    "lastName": "Mizrahi",
+    "userName": "yaelm",
+    "userId": "U2003",
+    "email": "yael.mizrahi@example.com",
+    "password": "123456",
+    "role": "user",
+    "status": "blocked"
+  },
+  {
+    "firstName": "Eitan",
+    "lastName": "Peretz",
+    "userName": "eitanp",
+    "userId": "U2004",
+    "email": "eitan.peretz@example.com",
+    "password": "123456",
+    "role": "user",
+    "status": "expired"
+  },
+  {
+    "firstName": "Shira",
+    "lastName": "Goldman",
+    "userName": "shirag",
+    "userId": "U2005",
+    "email": "shira.goldman@example.com",
+    "password": "123456",
+    "role": "admin",
+    "status": "active"
+  },
+  {
+    "firstName": "Amit",
+    "lastName": "Baron",
+    "userName": "amitb",
+    "userId": "U2006",
+    "email": "amit.baron@example.com",
+    "password": "123456",
+    "role": "user",
+    "status": "active"
+  }
+]

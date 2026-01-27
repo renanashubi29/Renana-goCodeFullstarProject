@@ -1,8 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
-import App from "./App";
-import { SingleProductPage } from "./pages/singleProductPage";
+import App from "./App.jsx";
+import { SingleProductPage } from "./pages/singleProductPage.jsx";
 import { useEffect, useState } from "react";
 import { ShopContext } from "./ShopContext";
+import { AdminPage } from "./pages/adminPage.jsx";
+import { useQuery } from "@tanstack/react-query";
+import { handleProducts } from "./api/productsApi.js";
+import { filterSortProducts } from "./utils/productUtils.js";
+
 
 export const Router=()=>{
     const [products, setProducts] = useState([]);
@@ -12,16 +17,54 @@ export const Router=()=>{
  const [filterAndSortedArray, setFilterAndSortedArray] = useState([]);
  const [minMax, setminMax] = useState([]);
 const [range, setRange] = useState([]); 
-const [rangeArr, setRangeArr] = useState([]); 
-     
+const [rangeArr, setRangeArr] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+// קטגוריה נבחרת
+const [categoryValue, setCategoryValue] = useState("All Items");
 
-console.log(minMax);
+// שיטת מיון
+const [sortValue, setSortValue] = useState("Featured");
+
+// טווח מחירים נבחר
+const [rangeValue, setRangeValue] = useState([0, 1000]);
+
+
+
+const { data: allProducts = [] } = useQuery({
+    queryKey: ["all-products"],
+    queryFn: handleProducts,
+  });
+  const categoriesOption = [
+    "All Items",
+    ...new Set(allProducts.map((p) => p.category)),
+  ];
+/* useEffect(() => {
+  if (!allProducts) return;
+    const sorted = filterSortProducts(products, {
+    categoryValue,
+    rangeValue,
+    sortValue
+  });
+
+
+ // חישוב minMax ו-rangeValue חדשים
+  const numbers = sorted.map(p => Number(p.price));
+  const newMinMax = [Math.min(...numbers), Math.max(...numbers)];
+console.log("nnn",newMinMax);
+  // עדכון רק אם השתנה
+  setminMax(newMinMax);
+  setRangeValue(newMinMax);
+
+}, [allProducts, categoryValue, sortValue]); */
+
+/* console.log(minMax);
 
   useEffect(() => {
     const handleProducts = async () => {
-      const response = await fetch("https://fakestoreapi.com/products");
+      const response = await fetch("http://localhost:3000/products", {
+  method: "GET"});
       const data = await response.json();
-
+console.log("Data:",data);
       setProducts(data);
       setFilteredProducts(data);
       setSortedProducts(data);
@@ -36,6 +79,8 @@ console.log(minMax);
 
     handleProducts();
   }, []);
+
+ 
 
   useEffect(() => {
     const cat = products
@@ -98,19 +143,7 @@ console.log(minMax);
 
    }, [filteredProducts,sortedProducts,rangeArr]);
 
-useEffect(() => {
-    console.log("show:",filteredProducts);
-const numbers = filteredProducts.map((item)=>{return Number(item.price)});
-setminMax([
-  Math.min(...numbers),
-  Math.max(...numbers)
-]);
-setRange([
-  Math.min(...numbers),
-  Math.max(...numbers)
-]);
 
-   }, [filteredProducts]);
 
  useEffect(() => {
 const min=range[0];
@@ -119,23 +152,37 @@ const arr= [...products].filter((item)=>{return Number(item.price)>=Number(min)&
 //console.log("arr:",arr);
   setRangeArr(arr);
    }, [range]);
-   
- const [cart, setCart] = useState(new Map());   
- const removeFromCart = (productId) => {
-  setCart(prev => {
-    const newCart = new Map(prev);
-    newCart.delete(productId);
-    return newCart;
-  });
-};
-const addToCart=(productId,amount)=>
-{
-   console.log("productId:",productId);
-   console.log("amount:",amount);
-    setCart(prev=>{return prev.set(productId, amount)});
-    console.log(cart);
+    */
+ const [cart, setCart] = useState([]);  
+ 
 
+ const removeFromCart = (productId) => {
+  setCart(prev => prev.filter(p => p._id !== productId));
 };
+ 
+const addToCart = (productId, amount) => {
+  const detailProduct=products.find(p=> p._id===productId);
+  setCart(prev => {
+  
+    const existingProduct = prev.find(p => p._id === productId);
+
+    if (existingProduct) {
+      return prev.map(p =>
+        p._id === productId ?  { ...p, amount } : p
+      );
+    }
+
+  return [
+      ...prev,
+      {
+        ...detailProduct,
+        amount
+      }
+    ];
+  });
+    setIsCartOpen(true); 
+};
+
    const router = createBrowserRouter([
   {
     path: "/",
@@ -144,10 +191,65 @@ const addToCart=(productId,amount)=>
   {
      path: "/products/:productId",
     element:<SingleProductPage/>,
+  },
+  {
+     path: "/admin",
+    element:<AdminPage/>,
   }
 ]);
+console.log("filter&sort",filterAndSortedArray);
+
+const deleteProduct = async (id) => {
+  console.log("delete id:", id);
+
+  await fetch(`http://localhost:3000/products/${id}`, {
+    method: "DELETE",
+  });
+
+  setFilterAndSortedArray((prev) => prev.filter((p) => p._id !== id));
+};
+const updateProduct = async (id, updatedData) => {
+    try {
+      const response = await fetch(`http://localhost:3000/products/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (response.ok) {
+        const updatedProduct = await response.json();
+        setFilterAndSortedArray((prev) =>
+          prev.map((p) => (p._id === id ? updatedProduct : p))
+        );
+      } else {
+        console.error("Failed to update product");
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
+  };
+  const addNewProduct = async (newProductData) => {
+  try {
+    const response = await fetch('http://localhost:3000/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProductData)
+    });
+
+    if (response.ok) {
+      const createdProduct = await response.json();
+      setFilterAndSortedArray(prev => [...prev, createdProduct]);
+      //setIsAddOpen(false);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 return ( <ShopContext.Provider
-      value={{ products: filterAndSortedArray, categories, handleCatChange, handleSortChange,addToCart,removeFromCart,setminMax,minMax,range,setRange}}>
+      value={{ products: allProducts, categories/* , handleCatChange, handleSortChange */,addToCart,removeFromCart,cart,setCart,setminMax,minMax,range,setRange,cart,isCartOpen,setIsCartOpen,deleteProduct,updateProduct,addNewProduct
+        ,setCategoryValue,setSortValue,rangeValue,categoryValue,sortValue,categoriesOption,setRangeValue
+      }}>
 <RouterProvider router={router} /> 
 </ShopContext.Provider>);
 };

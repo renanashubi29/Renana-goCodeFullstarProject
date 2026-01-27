@@ -205,7 +205,48 @@ label {
   line-height: 2em;
   text-transform: uppercase;
 }
+.productsCart {
+  display: flex;
 
+  flex-direction: column;
+  gap: 10px;
+}
+.productImage {
+  margin-right: 12px;
+}
+
+.productImage img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+    margin-right: 12px;
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  align-items: center;
+  gap: 10px; 
+
+}
+
+.productInfo h5 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.productInfo h6 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/**/
 .products {
   display: flex;
   flex-wrap: wrap;
