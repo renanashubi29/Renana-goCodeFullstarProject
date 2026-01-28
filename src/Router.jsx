@@ -205,7 +205,7 @@ console.log("filter&sort",filterAndSortedArray);
 const deleteProduct = async (id) => {
   console.log("delete id:", id);
 
-  await fetch(`http://localhost:3000/products/${id}`, {
+  await fetch(`http://localhost:3000/api/products/${id}`, {
     method: "DELETE",
   });
 
@@ -213,7 +213,7 @@ const deleteProduct = async (id) => {
 };
 const updateProduct = async (id, updatedData) => {
     try {
-      const response = await fetch(`http://localhost:3000/products/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/products/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
@@ -233,7 +233,7 @@ const updateProduct = async (id, updatedData) => {
   };
   const addNewProduct = async (newProductData) => {
   try {
-    const response = await fetch('http://localhost:3000/products', {
+    const response = await fetch('http://localhost:3000/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProductData)

@@ -12,8 +12,8 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cors());
-app.use("api/products", productRoutes);
-app.use("api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/users", userRoutes);
 
 const startServer=async()=>{
   await connectedDB(process.env.MONGO_URI);
