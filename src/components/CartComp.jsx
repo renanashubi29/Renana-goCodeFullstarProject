@@ -123,7 +123,7 @@ export const CartComp = () => {
           >
             <Box display="flex" alignItems="center">
               <Box sx={{ width: 80, height: 80, mr: 2 }}>
-                <img src={product.image} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} />
+                <img src={product.image}  alt={product.title} style={{ width: '80%', height: '100%', objectFit: 'contain', borderRadius: 4 }} />
               </Box>
               <Box>
                 <Typography variant="subtitle1">{product.title}</Typography>

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../ShopContext";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +18,8 @@ export const AdminPage = () => {
   const [editImage, setEditImage] = useState('');
   const [editRate, setEditRate] = useState('');
   const [editCount, setEditCount] = useState('');
+
+
 
   const handleEditClick = (product) => {
     setProductToEdit(product);
@@ -105,7 +107,7 @@ export const AdminPage = () => {
             {products.map((product) => (
               <TableRow key={product._id}>
                 <TableCell>
-                  <img src={product.image} alt={product.title} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }} />
+                  <img src={product.image} alt={product.title} style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: 4 }} />
                 </TableCell>
                 <TableCell>{product.title}</TableCell>
                 <TableCell>{product.price}</TableCell>

@@ -40,7 +40,7 @@ return (
           component="img"
            image={product.image}
           alt={product.name}
-           sx={{ width: "40%", borderRadius: 2 }}
+           sx={{ width: "40%",height:"80%" ,  objectFit: 'contain', borderRadius: 2 }}
         />
 
        {/* content */}

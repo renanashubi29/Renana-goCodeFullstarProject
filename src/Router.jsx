@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import App from "./App.jsx";
 import { SingleProductPage } from "./pages/singleProductPage.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ShopContext } from "./ShopContext";
 import { AdminPage } from "./pages/adminPage.jsx";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ import { filterSortProducts } from "./utils/productUtils.js";
 
 
 export const Router=()=>{
-    const [products, setProducts] = useState([]);
+   // const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
  const [sortedProducts, setSortedProducts] = useState([]);
@@ -34,10 +34,13 @@ const { data: allProducts = [] } = useQuery({
     queryKey: ["all-products"],
     queryFn: handleProducts,
   });
+  
   const categoriesOption = [
     "All Items",
     ...new Set(allProducts.map((p) => p.category)),
   ];
+    
+
 /* useEffect(() => {
   if (!allProducts) return;
     const sorted = filterSortProducts(products, {
@@ -161,7 +164,7 @@ const arr= [...products].filter((item)=>{return Number(item.price)>=Number(min)&
 };
  
 const addToCart = (productId, amount) => {
-  const detailProduct=products.find(p=> p._id===productId);
+  const detailProduct=allProducts.find(p=> p._id===productId);
   setCart(prev => {
   
     const existingProduct = prev.find(p => p._id === productId);
@@ -238,7 +241,8 @@ const updateProduct = async (id, updatedData) => {
 
     if (response.ok) {
       const createdProduct = await response.json();
-      setFilterAndSortedArray(prev => [...prev, createdProduct]);
+       setFilterAndSortedArray(prev => [...prev, createdProduct]); 
+      
       //setIsAddOpen(false);
     }
   } catch (error) {
@@ -247,7 +251,7 @@ const updateProduct = async (id, updatedData) => {
 };
 
 return ( <ShopContext.Provider
-      value={{ products: allProducts, categories/* , handleCatChange, handleSortChange */,addToCart,removeFromCart,cart,setCart,setminMax,minMax,range,setRange,cart,isCartOpen,setIsCartOpen,deleteProduct,updateProduct,addNewProduct
+      value={{  products: allProducts  , categories/* , handleCatChange, handleSortChange */,addToCart,removeFromCart,cart,setCart,setminMax,minMax,range,setRange,cart,isCartOpen,setIsCartOpen,deleteProduct,updateProduct,addNewProduct
         ,setCategoryValue,setSortValue,rangeValue,categoryValue,sortValue,categoriesOption,setRangeValue
       }}>
 <RouterProvider router={router} /> 
