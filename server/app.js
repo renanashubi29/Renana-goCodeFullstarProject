@@ -18,7 +18,7 @@ app.use("api/users", userRoutes);
 const startServer=async()=>{
   await connectedDB(process.env.MONGO_URI);
   app.listen(port,()=>{
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at port ${port}`);
   });
 };
 startServer();
