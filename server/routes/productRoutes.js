@@ -1,8 +1,9 @@
 import express from "express";
 import { createProductController, deleteProductController, getAllProductsController, getProductByIdController, resetProductsController, updateProductController } from  "../controllers/ProductController.js";
+import { verifyToken } from "../middlwares/auth.js";
 const router = express.Router();
 //הנתיב הוא products...
-router.get("/",getAllProductsController);
+router.get("/"/*, verifyToken */,getAllProductsController);
 
 router.get("/:id", getProductByIdController);
 
