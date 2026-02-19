@@ -16,6 +16,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 
 const startServer=async()=>{
+  console.log("Testing Git from the new location!");
   await connectedDB(process.env.MONGO_URI);
   app.listen(port,()=>{
     console.log(`Server running at port ${port}`);
