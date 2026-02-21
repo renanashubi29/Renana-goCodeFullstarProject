@@ -1,169 +1,108 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ShopContext } from "../ShopContext";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, Paper, Typography, TableContainer, Table } from '@mui/material';
+import { AdminTableHead } from "../components/AdminPageComp/AdminTableHead";
+import { ProductsTable } from "../components/AdminPageComp/ProductsTable";
+import { ProductDialog } from "../components/AdminPageComp/ProductDialog";
 export const AdminPage = () => {
   const { products, deleteProduct, updateProduct, addNewProduct } = useContext(ShopContext);
 
-  // ------------------- Edit -------------------
+  // --- סטייטים נפרדים לגמרי ---
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [productToEdit, setProductToEdit] = useState(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editPrice, setEditPrice] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editCategory, setEditCategory] = useState('');
-  const [editImage, setEditImage] = useState('');
-  const [editRate, setEditRate] = useState('');
-  const [editCount, setEditCount] = useState('');
-
-
-
-  const handleEditClick = (product) => {
-    setProductToEdit(product);
-    setEditTitle(product.title);
-    setEditPrice(product.price);
-    setEditDescription(product.description);
-    setEditCategory(product.category);
-    setEditImage(product.image);
-    setEditRate(product.rating?.rate || 0);
-    setEditCount(product.rating?.count || 0);
-    setIsEditOpen(true);
-  };
-
-  const handleSaveUpdate = async () => {
-    if (!productToEdit) return;
-
-    const updatedData = {
-      title: editTitle,
-      price: Number(editPrice),
-      description: editDescription,
-      category: editCategory,
-      image: editImage,
-      rating: { rate: Number(editRate), count: Number(editCount) }
-    };
-
-    await updateProduct(productToEdit._id, updatedData);
-    setIsEditOpen(false);
-  };
-
-  // ------------------- Add -------------------
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newCategory, setNewCategory] = useState('');
-  const [newImage, setNewImage] = useState('');
-  const [newRate, setNewRate] = useState(0);
-  const [newCount, setNewCount] = useState(0);
+  
+  const [editFormData, setEditFormData] = useState({});
+  const [newFormData, setNewFormData] = useState({
+    title: '', price: '', description: '', category: '', image: '', rate: 0, count: 0
+  });
 
-  const handleAddClick = () => {
-    setNewTitle('');
-    setNewPrice('');
-    setNewDescription('');
-    setNewCategory('');
-    setNewImage('');
-    setNewRate(0);
-    setNewCount(0);
-    setIsAddOpen(true);
+  // --- פונקציות עדכון הסטייט בזמן הקלדה ---
+
+  // כשמקלידים במודל עריכה
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({ ...editFormData, [name]: value });
   };
 
-  const handleSaveNewProduct = async () => {
-    const newProductData = {
-      title: newTitle,
-      price: Number(newPrice),
-      description: newDescription,
-      category: newCategory,
-      image: newImage,
-      rating: { rate: Number(newRate), count: Number(newCount) }
+  // כשמקלידים במודל הוספה
+  const handleAddChange = (e) => {
+    const { name, value } = e.target;
+    setNewFormData({ ...newFormData, [name]: value });
+  };
+
+  //  פונקציות שמירה
+  const saveUpdate = async () => {
+    const id = editFormData._id;
+    const dataForServer = {
+      title: editFormData.title,
+      price: Number(editFormData.price),
+      description: editFormData.description,
+      category: editFormData.category,
+      image: editFormData.image,
+      rating: { rate: Number(editFormData.rate), count: Number(editFormData.count) }
     };
-    await addNewProduct(newProductData);
-    setIsAddOpen(false);
+
+    await updateProduct(id, dataForServer);
+    setIsEditOpen(false); // סגירת המודל
+  };
+
+  const saveNew = async () => {
+    const dataForServer = {
+      title: newFormData.title,
+      price: Number(newFormData.price),
+      description: newFormData.description,
+      category: newFormData.category,
+      image: newFormData.image,
+      rating: { rate: Number(newFormData.rate), count: Number(newFormData.count) }
+    };
+
+    await addNewProduct(dataForServer);
+    setIsAddOpen(false); // סגירת המודל
+    // איפוס הטופס
+    setNewFormData({ title: '', price: '', description: '', category: '', image: '', rate: 0, count: 0 });
   };
 
   return (
-    <Box>
-      <Button variant="contained" startIcon={<AddIcon />} sx={{ mb: 2 }} onClick={handleAddClick}>
-        הוסף מוצר
-      </Button>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3 }}>ניהול מוצרים</Typography>
 
-      <TableContainer component={Paper}>
+      <Button variant="contained" onClick={() => setIsAddOpen(true)}>הוסף מוצר חדש</Button>
+
+      <TableContainer component={Paper} sx={{ mt: 3 }}>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>תמונה</TableCell>
-              <TableCell>שם</TableCell>
-              <TableCell>מחיר</TableCell>
-              <TableCell>תיאור</TableCell>
-              <TableCell>קטגוריה</TableCell>
-              <TableCell>דירוג</TableCell>
-              <TableCell>מספר דירוגים</TableCell>
-              <TableCell>פעולות</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {products.map((product) => (
-              <TableRow key={product._id}>
-                <TableCell>
-                  <img src={product.image} alt={product.title} style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: 4 }} />
-                </TableCell>
-                <TableCell>{product.title}</TableCell>
-                <TableCell>{product.price}</TableCell>
-                <TableCell>{product.description}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.rating?.rate}</TableCell>
-                <TableCell>{product.rating?.count}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleEditClick(product)}><EditIcon /></IconButton>
-                  <IconButton onClick={() => deleteProduct(product._id)} color="error"><DeleteIcon /></IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          <AdminTableHead />
+          <ProductsTable 
+            products={products} 
+            onEdit={(p) => {
+              setEditFormData({ ...p, rate: p.rating?.rate, count: p.rating?.count });
+              setIsEditOpen(true);
+            }} 
+            onDelete={deleteProduct} 
+          />
         </Table>
       </TableContainer>
 
-      {/* Edit Modal */}
-      <Dialog open={isEditOpen} onClose={() => setIsEditOpen(false)}>
-        <DialogTitle>עריכת {productToEdit?.title}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="שם מוצר" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-            <TextField label="מחיר" type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} />
-            <TextField label="תיאור" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
-            <TextField label="קטגוריה" value={editCategory} onChange={(e) => setEditCategory(e.target.value)} />
-            <TextField label="תמונה (URL)" value={editImage} onChange={(e) => setEditImage(e.target.value)} />
-            <TextField label="דירוג" type="number" value={editRate} onChange={(e) => setEditRate(e.target.value)} />
-            <TextField label="מספר דירוגים" type="number" value={editCount} onChange={(e) => setEditCount(e.target.value)} />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsEditOpen(false)}>ביטול</Button>
-          <Button onClick={handleSaveUpdate} variant="contained">שמור שינויים</Button>
-        </DialogActions>
-      </Dialog>
+      {/* מודל הוספה */}
+<ProductDialog 
+  open={isAddOpen} 
+  onClose={() => setIsAddOpen(false)} 
+  title="הוספת מוצר חדש" 
+  formData={newFormData} 
+  onChange={handleAddChange} 
+  onSave={saveNew} 
+  submitLabel="הוסף מוצר" 
+/>
 
-      {/* Add Modal */}
-      <Dialog open={isAddOpen} onClose={() => setIsAddOpen(false)}>
-        <DialogTitle>הוספת מוצר חדש</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="שם מוצר" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
-            <TextField label="מחיר" type="number" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} />
-            <TextField label="תיאור" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} />
-            <TextField label="קטגוריה" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
-            <TextField label="תמונה (URL)" value={newImage} onChange={(e) => setNewImage(e.target.value)} />
-            <TextField label="דירוג" type="number" value={newRate} onChange={(e) => setNewRate(e.target.value)} />
-            <TextField label="מספר דירוגים" type="number" value={newCount} onChange={(e) => setNewCount(e.target.value)} />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsAddOpen(false)}>ביטול</Button>
-          <Button onClick={handleSaveNewProduct} variant="contained">שמור מוצר חדש</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+{/* מודל עריכה */}
+<ProductDialog 
+  open={isEditOpen} 
+  onClose={() => setIsEditOpen(false)} 
+  title="עריכת מוצר" 
+  formData={editFormData} 
+  onChange={handleEditChange} 
+  onSave={saveUpdate} 
+  submitLabel="שמור שינויים" 
+/>
+</Box>
   );
 };

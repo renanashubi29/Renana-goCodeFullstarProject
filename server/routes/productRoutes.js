@@ -2,7 +2,7 @@ import express from "express";
 import { createProductController, deleteProductController, getAllProductsController, getProductByIdController, resetProductsController, updateProductController } from  "../controllers/ProductController.js";
 import { verifyToken } from "../middlwares/auth.js";
 const router = express.Router();
-//הנתיב הוא products...
+
 router.get("/"/*, verifyToken */,getAllProductsController);
 
 router.get("/:id", getProductByIdController);
@@ -14,4 +14,5 @@ router.post("/resetProducts",resetProductsController);
 router.delete("/:id",deleteProductController);
 
 router.put("/:id",updateProductController);
+
 export default router;

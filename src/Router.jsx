@@ -1,24 +1,21 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import App from "./App.jsx";
 import { SingleProductPage } from "./pages/singleProductPage.jsx";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect,  useState } from "react";
 import { ShopContext } from "./ShopContext";
 import { AdminPage } from "./pages/adminPage.jsx";
 import { useQuery } from "@tanstack/react-query";
-import { handleProducts } from "./api/productsApi.js";
-import { filterSortProducts } from "./utils/productUtils.js";
+import { handleProducts,deleteProductApi, updateProductApi, addNewProductApi } from "./api/productsApi.js";
+
+
 
 
 export const Router=()=>{
-   // const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
- const [sortedProducts, setSortedProducts] = useState([]);
- const [filterAndSortedArray, setFilterAndSortedArray] = useState([]);
- const [minMax, setminMax] = useState([]);
-const [range, setRange] = useState([]); 
-const [rangeArr, setRangeArr] = useState([]);
+   const [products, setProducts] = useState([]);
+ const [minMax, setminMax] = useState([0, 1000]);
+//const [range, setRange] = useState([]); 
   const [isCartOpen, setIsCartOpen] = useState(false);
+   const [cart, setCart] = useState([]);
 // קטגוריה נבחרת
 const [categoryValue, setCategoryValue] = useState("All Items");
 
@@ -41,122 +38,11 @@ const { data: allProducts = [] } = useQuery({
   ];
     
 
-/* useEffect(() => {
-  if (!allProducts) return;
-    const sorted = filterSortProducts(products, {
-    categoryValue,
-    rangeValue,
-    sortValue
-  });
-
-
- // חישוב minMax ו-rangeValue חדשים
-  const numbers = sorted.map(p => Number(p.price));
-  const newMinMax = [Math.min(...numbers), Math.max(...numbers)];
-console.log("nnn",newMinMax);
-  // עדכון רק אם השתנה
-  setminMax(newMinMax);
-  setRangeValue(newMinMax);
-
-}, [allProducts, categoryValue, sortValue]); */
-
-/* console.log(minMax);
-
-  useEffect(() => {
-    const handleProducts = async () => {
-      const response = await fetch("http://localhost:3000/products", {
-  method: "GET"});
-      const data = await response.json();
-console.log("Data:",data);
-      setProducts(data);
-      setFilteredProducts(data);
-      setSortedProducts(data);
-      setFilterAndSortedArray(data);
-      setRangeArr(data);
-      const pricesArr=data.map((item)=>{return item.price;});
-      setminMax([Math.min(...pricesArr), Math.max(...pricesArr)]);
-       setRange([Math.min(...pricesArr), Math.max(...pricesArr)]);
-
-
-    };
-
-    handleProducts();
-  }, []);
-
- 
-
-  useEffect(() => {
-    const cat = products
-      ?.map((p) => p.category)
-      .filter((value, index, array) => array.indexOf(value) === index);
-
-    if (cat && cat.length > 0) {
-      cat.unshift("All Items");
-      setCategories(cat);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products]);
-
-  const handleCatChange = (category) => {
-    console.log(category);
-    if (category === "All Items") {
-      setFilteredProducts(products);
-
-    } else {
-      setFilteredProducts(products.filter((p) => p.category === category));
-      
-    }
-    
-  };
-
-  const handleSortChange = (sortName) => {
-      let sortedArray=[];
-    switch(sortName){
-
-    case "Featured":
-      setSortedProducts(products);
-      break;
-    case "Alphabetically, A-Z":{
-      
-    sortedArray= [...products].sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-     setSortedProducts(sortedArray);
-     break;
-     }
-     case "Alphabetically, Z-A":{
-      
-    sortedArray= [...products].sort((a,b) => (a.title > b.title) ? -1 : ((b.title > a.title) ? 1 : 0));
-     setSortedProducts(sortedArray);
-     break;
-     }
-      case "Price, low to high":{
-     sortedArray= [...products].sort((a,b) => (a.price > b.price) ? 1 : ((b.price > a.price) ? -1 : 0));
-     setSortedProducts(sortedArray);
-     break;
-      }
-     case "Price, high to low":{
-     sortedArray= [...products].sort((a,b) => (a.price > b.price) ? -1 : ((b.price > a.price) ? 1 : 0));
-     setSortedProducts(sortedArray);
-     break;
-     }
-     
-    }
-  };
-  useEffect(() => {
-   setFilterAndSortedArray((sortedProducts.filter(item =>filteredProducts.includes(item))).filter(ele =>rangeArr.includes(ele)));
-
-   }, [filteredProducts,sortedProducts,rangeArr]);
-
-
-
- useEffect(() => {
-const min=range[0];
-const max=range[1];
-const arr= [...products].filter((item)=>{return Number(item.price)>=Number(min)&&Number(item.price)<=Number(max)});
-//console.log("arr:",arr);
-  setRangeArr(arr);
-   }, [range]);
-    */
- const [cart, setCart] = useState([]);  
+useEffect(() => {
+  if (allProducts.length > 0) {
+    setProducts(allProducts);
+  }
+}, [allProducts]);
  
 
  const removeFromCart = (productId) => {
@@ -200,59 +86,49 @@ const addToCart = (productId, amount) => {
     element:<AdminPage/>,
   }
 ]);
-console.log("filter&sort",filterAndSortedArray);
-
+//console.log("filter&sort",filterAndSortedArray);
+// פונקציית מחיקה
 const deleteProduct = async (id) => {
-  console.log("delete id:", id);
-
-  await fetch(`http://localhost:3000/api/products/${id}`, {
-    method: "DELETE",
-  });
-
-  setFilterAndSortedArray((prev) => prev.filter((p) => p._id !== id));
-};
-const updateProduct = async (id, updatedData) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/products/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-
-      if (response.ok) {
-        const updatedProduct = await response.json();
-        setFilterAndSortedArray((prev) =>
-          prev.map((p) => (p._id === id ? updatedProduct : p))
-        );
-      } else {
-        console.error("Failed to update product");
-      }
-    } catch (error) {
-      console.error("Error updating product:", error);
-    }
-  };
-  const addNewProduct = async (newProductData) => {
   try {
-    const response = await fetch('http://localhost:3000/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProductData)
-    });
-
-    if (response.ok) {
-      const createdProduct = await response.json();
-       setFilterAndSortedArray(prev => [...prev, createdProduct]); 
-      
-      //setIsAddOpen(false);
-    }
+    await deleteProductApi(id); // קריאה לשרת דרך הקובץ החיצוני
+    setProducts((prev) => prev.filter((p) => p._id !== id));
+    console.log("Deleted successfully");
   } catch (error) {
-    console.error(error);
+    console.error("Error deleting:", error);
   }
 };
 
+// פונקציית עדכון
+const updateProduct = async (id, updatedData) => {
+  try {
+    const updatedProduct = await updateProductApi(id, updatedData); // מחזיר את המוצר המעודכן מהשרת
+    setProducts((prev) =>
+      prev.map((p) => (p._id === id ? updatedProduct : p))
+    );
+  } catch (error) {
+    console.error("Error updating:", error);
+  }
+};
+
+// פונקציית הוספה
+const addNewProduct = async (newProductData) => {
+  try {
+    const createdProduct = await addNewProductApi(newProductData); // מחזיר את המוצר החדש עם ה-ID מהשרת
+    setProducts((prev) => [...prev, createdProduct]);
+  } catch (error) {
+    console.error("Error adding:", error);
+  }
+};
+
+
 return ( <ShopContext.Provider
-      value={{  products: allProducts  , categories/* , handleCatChange, handleSortChange */,addToCart,removeFromCart,cart,setCart,setminMax,minMax,range,setRange,cart,isCartOpen,setIsCartOpen,deleteProduct,updateProduct,addNewProduct
-        ,setCategoryValue,setSortValue,rangeValue,categoryValue,sortValue,categoriesOption,setRangeValue
+      value={{  products: products  
+        ,addToCart,removeFromCart,cart,setCart,
+        setminMax,minMax,/* range,setRange, */
+        isCartOpen,setIsCartOpen,
+        deleteProduct,updateProduct,addNewProduct,
+        categoriesOption,
+        setCategoryValue,categoryValue,setSortValue,sortValue,rangeValue,setRangeValue
       }}>
 <RouterProvider router={router} /> 
 </ShopContext.Provider>);
