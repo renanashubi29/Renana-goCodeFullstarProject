@@ -3,8 +3,8 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const getAllUsers = () => {
-  return User.find({});
+export const getAllUsers = async () => {
+  return await User.find({});
 };
 
 export const getUserById = async(id) => {
@@ -15,26 +15,50 @@ export const getUserByEmail = async(emailInput) => {
   return await User.findOne({email: emailInput  });
   
 };
+
 export const resetUsersFromFile = async () => {
-  const users = JSON.parse(fs.readFileSync("./users.json", "utf-8"));
-  await User.deleteMany({});
-  return User.insertMany(users);
+  const filePath = "./users.json";
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error("Source file 'users.json' not found");
+  }
+
+  try {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+
+    if (!fileContent.trim()) {
+      throw new Error("The JSON file is empty");
+    }
+
+    const users = JSON.parse(fileContent);
+
+    if (!Array.isArray(users) || users.length === 0) {
+      throw new Error("The file must contain a non-empty array of users");
+    }
+
+    await User.deleteMany({});
+    return await User.insertMany(users);
+
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("Invalid JSON format in 'users.json'");
+    }
+    throw error;
+  }
 };
-export const createUser = (data) => {
+export const createUser = async(data) => {
   const user = new User(data);
-  return user.save();
+  return await user.save();
 };
-export const deleteUserById = (id) => {
-  return User.findByIdAndDelete({_id: id});
+export const deleteUserById = async(id) => {
+  return await User.findByIdAndDelete({_id: id});
 };
 
-export const updateUserById = (id, data) => {
-  return User.findByIdAndUpdate({_id: id}, data, { new: true });
+export const updateUserById = async(id, data) => {
+  return await User.findByIdAndUpdate({_id: id}, data, { new: true });
 };
 export const deleteAllUsers  = async () => {
-
-    const result = await User.deleteMany({});
-    return result; 
+return await User.deleteMany({});
   
 };
 
