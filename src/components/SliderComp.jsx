@@ -8,10 +8,11 @@ export const SliderComp = () => {
     setRangeValue, 
     rangeValue, 
     products,
-    categoryValue
+    categoryValue,
+    setminMax,minMax
   } = useContext(ShopContext);
 
-const { data: allProducts = [] } = useQuery({ queryKey: ["all-products"] });
+ const { data: allProducts = [] } = useQuery({ queryKey: ["all-products"] });
 
   const limits = useMemo(() => {
     // פילטור של כל המוצרים רק לפי הקטגוריה הנבחרת
@@ -34,7 +35,7 @@ const { data: allProducts = [] } = useQuery({ queryKey: ["all-products"] });
     
     console.log("הסליידר התאפס לקצוות החדשים:", limits);
   }, [limits.min, limits.max, setRangeValue]);
-
+ 
   const handleChange = (event, newValue) => {
     setRangeValue(newValue);
   };
