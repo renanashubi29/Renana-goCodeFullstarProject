@@ -19,7 +19,7 @@ SetItemsInCart(cart.length);
       <ShoppingCartIcon />
       {ItemsInCart}
     </button>
-      <h1>Jackets</h1>
+      <h1>The Product Store</h1>
      
         <SliderComp />   
       <SortSection />

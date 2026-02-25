@@ -5,7 +5,7 @@ const BASE_URL = `${import.meta.env.VITE_API_URL}/products`;
 export const handleProducts = async () => {
   // הגדרת הכתובת ישירות או דרך המשתנה (לוודא שהשם תואם ל-ENV)
   const url = `${import.meta.env.VITE_API_URL}/products`;
-  console.log("Fetching from:", url);
+
 
   const response = await fetch(BASE_URL); // ברירת המחדל היא GET
 

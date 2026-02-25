@@ -86,7 +86,7 @@ const addToCart = (productId, amount) => {
     element:<AdminPage/>,
   }
 ]);
-//console.log("filter&sort",filterAndSortedArray);
+
 // פונקציית מחיקה
 const deleteProduct = async (id) => {
   try {

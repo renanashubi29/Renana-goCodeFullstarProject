@@ -30,10 +30,8 @@ export const SliderComp = () => {
     };
   }, [allProducts, categoryValue]);
   useEffect(() => {
-    // כאן אנחנו מעדכנים את המיקום של העיגולים לקצוות החדשים
-    setRangeValue([limits.min, limits.max]);
-    
-    console.log("הסליידר התאפס לקצוות החדשים:", limits);
+    setRangeValue([limits.min, limits.max]);  
+  
   }, [limits.min, limits.max, setRangeValue]);
  
   const handleChange = (event, newValue) => {

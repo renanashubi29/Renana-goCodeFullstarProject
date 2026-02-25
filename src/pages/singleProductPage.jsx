@@ -14,10 +14,9 @@ const {products}=useContext(ShopContext);
 const product = products?.find(
   p => p._id=== productId
 );
-console.log("product",productId);
+
 
 const fieldValueArr = product ? Object.entries(product) : [];
-console.log(fieldValueArr);
 const closepopup=()=>{
 openchange(false);
 }

@@ -4,7 +4,6 @@ export const filterSortProducts = (
   setRangeValue}
 ) => {
    
-  console.log("categoryValue",categoryValue);
   if (!products || products.length === 0) return [];
 
   let result = [...products];
